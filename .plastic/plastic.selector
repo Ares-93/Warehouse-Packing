@@ -1,0 +1,4 @@
+repository "Warehouse Packing 2026-10-23_14-57-19/Warehouse Packing@2476035410696@cloud"
+  path "/"
+    br "/main"
+    co "/main"
