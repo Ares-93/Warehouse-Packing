@@ -5,25 +5,29 @@ using UnityEngine.Events;
 
 public class PackingTableSensor : MonoBehaviour
 {
-   
-    [SerializeField] private TrainingPackage[] packages =
-        new TrainingPackage[5];
+    // Connect the GameLogic scene object .
+    public GameLogic gameLogic;
+
+    // Connect Box1 through Box5 .
+    public TrainingPackage[] packages = new TrainingPackage[5];
+
+    // Connect the ProgressCheckList .
+    public TMP_Text progressChecklist;
 
    
-    [SerializeField] private TMP_Text progressChecklist;
+    public UnityEvent onAllPackagesPlaced = new UnityEvent();
 
-    
-    [SerializeField] private UnityEvent onAllPackagesPlaced;
-
-    // Remembers the colliders currently touching our sensor.
    
+    public bool AllPackagesPlaced { get; private set; }
+
+
     private readonly HashSet<Collider> touchingColliders =
         new HashSet<Collider>();
 
-    // Remembers the last displayed text to avoid updating it every frame.
+  
     private string previousText;
 
-    // Prevents the completion event from firing repeatedly.
+    // Makes sure we only report completion once
     private bool completionReported;
 
     private void OnTriggerEnter(Collider other)
@@ -33,7 +37,7 @@ public class PackingTableSensor : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        
+        // Also detects boxes already inside when the sensor turns on.
         touchingColliders.Add(other);
     }
 
@@ -47,18 +51,18 @@ public class PackingTableSensor : MonoBehaviour
         int completedCount = 0;
         string checklist = "";
 
-        // Check each of our five packages separately.
+        // Check each package separately.
         for (int i = 0; i < packages.Length; i++)
         {
             TrainingPackage package = packages[i];
             bool isPlaced = false;
 
-          
+            // holding a box must is not counted as placed.
             if (package != null && !package.IsHeld)
             {
                 foreach (Collider boxCollider in touchingColliders)
                 {
-                   
+                    // Ignore colliders that are missing or turned off.
                     if (boxCollider == null ||
                         !boxCollider.enabled ||
                         !boxCollider.gameObject.activeInHierarchy)
@@ -66,8 +70,7 @@ public class PackingTableSensor : MonoBehaviour
                         continue;
                     }
 
-                    // Look for TrainingPackage on the collider
-                    
+                    // Find the package on this collider or its parent.
                     TrainingPackage detectedPackage =
                         boxCollider.GetComponentInParent<TrainingPackage>();
 
@@ -75,8 +78,7 @@ public class PackingTableSensor : MonoBehaviour
                     {
                         isPlaced = true;
 
-                        // We found this package.
-                        
+                        // Count this box only once.
                         break;
                     }
                 }
@@ -87,38 +89,47 @@ public class PackingTableSensor : MonoBehaviour
                 completedCount++;
             }
 
-            
-            string mark = isPlaced ? "[X]" : "[ ]";
+            // Show Complete beside each placed package.
+            string status = isPlaced ? " — Complete" : "";
 
-            checklist += mark + " Package " + (i + 1) + "\n\n";
+            checklist += "Package " + (i + 1) + status + "\n\n";
+        }
+
+        // Update this in every state so Confirm can check it.
+        AllPackagesPlaced =
+            packages.Length == 5 && completedCount == 5;
+
+        // Only State 1 can update the panel or report completion.
+        if (gameLogic == null || gameLogic.CurrentState != 1)
+        {
+            return;
         }
 
         checklist += "Completed: " + completedCount + "/5";
 
-        // Update the panel 
+        // Change the panel only when the text changes.
         if (progressChecklist != null && checklist != previousText)
         {
             progressChecklist.text = checklist;
             previousText = checklist;
         }
 
-        // All five must be inside the sensor
-        if (packages.Length == 5 &&
-            completedCount == 5 &&
-            !completionReported)
+        if (AllPackagesPlaced && !completionReported)
         {
             completionReported = true;
+
             Debug.Log("State 1 complete: all five packages are placed.");
 
-          
+            // Tell GameLogic to enter State 2.
             onAllPackagesPlaced.Invoke();
         }
     }
 
     private void OnDisable()
     {
-       
+        // Clear old info when the sensor turns off.
         touchingColliders.Clear();
+        AllPackagesPlaced = false;
         previousText = null;
         completionReported = false;
     }

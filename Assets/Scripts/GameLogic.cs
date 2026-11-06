@@ -3,14 +3,17 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour
 {
+    // Connects the packing-table sensor 
+    public PackingTableSensor tableSensor;
 
+    //connects the states
     public GameObject state1Group;
     public GameObject state2Group;
     public GameObject state3Group;
     public GameObject state4Group;
     public GameObject state5Group;
 
-
+    //connects the title, insturctions and checklist
     public TMP_Text trainingTitle;
     public TMP_Text taskInstructions;
     public TMP_Text progressChecklist;
@@ -81,16 +84,34 @@ public class GameLogic : MonoBehaviour
     //          Go to STATE 3.
 
     public void ConfirmOrder()
+{
+    // The button only works during State 2.
+    if (CurrentState != 2)
     {
-        // The Confirm button only works during State 2.
-        if (CurrentState != 2)
-        {
-            return;
-        }
-
-        
-        StartState3();
+        return;
     }
+
+    // Do not continue if the sensor was not connected.
+    if (tableSensor == null)
+    {
+        Debug.LogWarning("Connect Table Sensor on GameLogic.");
+        return;
+    }
+
+    // All five boxes must still be placed on the table.
+    if (!tableSensor.AllPackagesPlaced)
+    {
+        SetInstructions(
+            "Place all 5 packages on the table and release them.\n\n" +
+            "Then press Confirm again."
+                       );
+
+                return;
+    }
+
+    // The order is verified. Begin filling the boxes.
+    StartState3();
+}
    
     // STATE 3: Fill the Boxes
     // Instructions: Put one item inside each box.
