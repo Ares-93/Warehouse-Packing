@@ -31354,6 +31354,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f29f9d244efd892418f6f6a32338bb62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  state1Group: {fileID: 1457106105}
+  state2Group: {fileID: 2084535003}
+  state3Group: {fileID: 1619051250}
+  state4Group: {fileID: 663850229}
+  state5Group: {fileID: 1329154199}
+  trainingTitle: {fileID: 1026698058}
+  taskInstructions: {fileID: 2065869478}
+  progressChecklist: {fileID: 1310775528}
 --- !u!4 &1095664960
 Transform:
   m_ObjectHideFlags: 0
@@ -38357,7 +38365,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1329154200}
   m_Layer: 0
-  m_Name: State 2:Prep for delivery
+  m_Name: State 5:Prep for delivery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
