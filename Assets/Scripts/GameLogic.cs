@@ -20,12 +20,17 @@ public class GameLogic : MonoBehaviour
          // hit confirm button
          //     Goto STATE 3
     
-    // STATE 3: Package Prep
+
+    //STATE 3: Fill the Boxes 
+    // Put three items inside each box—15 items total
+    //Checklist 15 items total packed
+
+    // STATE 4: Package Prep
     // Instructions: Prepare the packages by making sure they are taped
     // Confirm all 5 are taped
     //          Goto STATE 4
 
-    // STATE 4: Get packages ready to deliver
+    // STATE 5: Get packages ready to deliver
         //Instructions: "Put all the packages in the truck to be deliverd"
         // Progress: "Ready to Deliver: 0/5"
     
